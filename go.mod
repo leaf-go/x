@@ -1,4 +1,4 @@
-module x
+module github.com/leaf-go/x
 
 go 1.17
 
