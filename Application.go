@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"net/http"
 	"time"
@@ -25,7 +26,7 @@ type IApplication interface {
 	Handler() interface{}
 
 	// Shutdown 关闭服务
-	Shutdown()
+	Shutdown(processed chan<- bool)
 
 	// Config 自定义配置
 	Config(config interface{}) IApplication
@@ -72,9 +73,9 @@ func (d *DefaultHttp) AutoConfig() IApplication {
 	return d
 }
 
-func (d *DefaultHttp) Shutdown() {
+func (d *DefaultHttp) Shutdown(processed chan<- bool) {
 	sg := <-quit()
-	fmt.Printf("signal: %+v\n" , sg)
+	fmt.Printf("signal: %+v\n", sg)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 	if err := d.server.Shutdown(ctx); err != nil {
@@ -82,9 +83,11 @@ func (d *DefaultHttp) Shutdown() {
 			panic(err)
 		}
 	}
+
+	processed <- false
 }
 
-func (d *DefaultHttp) Boot() error {
+func (d *DefaultHttp) Boot() (err error) {
 	d.server = &http.Server{
 		Addr:         d.config.Link(),
 		Handler:      d.handler,
@@ -92,9 +95,18 @@ func (d *DefaultHttp) Boot() error {
 		WriteTimeout: time.Duration(d.config.WriteTimeout) * time.Second,
 	}
 
+	processed := make(chan bool)
+
 	// 需要修复
-	go d.Shutdown()
-	return d.server.ListenAndServe()
+	go d.Shutdown(processed)
+	if err = d.server.ListenAndServe(); err != nil {
+		close(processed)
+		return
+	}
+
+	<-processed
+	color.Cyan("processed...")
+	return nil
 }
 
 func (d *DefaultHttp) Config(config interface{}) IApplication {
