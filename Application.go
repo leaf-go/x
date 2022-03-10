@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/BurntSushi/toml"
-	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"net/http"
 	"time"
@@ -26,7 +25,7 @@ type IApplication interface {
 	Handler() interface{}
 
 	// Shutdown 关闭服务
-	Shutdown(processed chan<- bool)
+	Shutdown()
 
 	// Config 自定义配置
 	Config(config interface{}) IApplication
@@ -73,9 +72,7 @@ func (d *DefaultHttp) AutoConfig() IApplication {
 	return d
 }
 
-func (d *DefaultHttp) Shutdown(processed chan<- bool) {
-	sg := <-quit()
-	fmt.Printf("signal: %+v\n", sg)
+func (d *DefaultHttp) Shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 	if err := d.server.Shutdown(ctx); err != nil {
@@ -83,8 +80,6 @@ func (d *DefaultHttp) Shutdown(processed chan<- bool) {
 			panic(err)
 		}
 	}
-
-	processed <- false
 }
 
 func (d *DefaultHttp) Boot() (err error) {
@@ -95,17 +90,11 @@ func (d *DefaultHttp) Boot() (err error) {
 		WriteTimeout: time.Duration(d.config.WriteTimeout) * time.Second,
 	}
 
-	processed := make(chan bool)
-
 	// 需要修复
-	go d.Shutdown(processed)
 	if err = d.server.ListenAndServe(); err != nil {
-		close(processed)
 		return
 	}
 
-	<-processed
-	color.Cyan("processed...")
 	return nil
 }
 

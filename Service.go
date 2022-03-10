@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime/debug"
+	"time"
 )
 
 type IBootstrap interface {
@@ -50,12 +51,15 @@ func (d DefaultService) handler(name string) {
 	if app == nil {
 		panic(fmt.Sprintf("service {%s} not found", name))
 	}
-
-	if err := app.Boot(); err != nil {
-		panic(fmt.Sprintf("service {%s} boot failed: %v", name, err))
-	}
-
-	fmt.Println(name, "booted")
+	Shutdown := quit()
+	go func() {
+		if err := app.Boot(); err != nil {
+			panic(fmt.Sprintf("service {%s} boot failed: %v", name, err))
+		}
+	}()
+	<-Shutdown
+	app.Shutdown()
+	time.Sleep(2 * time.Second)
 }
 
 func (d DefaultService) Boot() {
@@ -70,7 +74,7 @@ func (d DefaultService) Boot() {
 }
 
 func quit() chan os.Signal {
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
 	//signal.Notify(c,os.Signal())
 	return c
