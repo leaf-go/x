@@ -91,11 +91,12 @@ func (d *DefaultHttp) Boot() (err error) {
 	}
 
 	// 需要修复
-	if err = d.server.ListenAndServe(); err != nil {
-		return
+	err = d.server.ListenAndServe()
+	if err == http.ErrServerClosed {
+		return nil
 	}
 
-	return nil
+	return
 }
 
 func (d *DefaultHttp) Config(config interface{}) IApplication {
