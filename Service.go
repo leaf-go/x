@@ -2,6 +2,7 @@ package x
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"runtime/debug"
@@ -53,10 +54,12 @@ func (d DefaultService) handler(name string) {
 	}
 	Shutdown := quit()
 	go func() {
-		if err := app.Boot(); err != nil {
+		err := app.Boot()
+		if err != http.ErrServerClosed {
 			panic(fmt.Sprintf("service {%s} boot failed: %v", name, err))
 		}
 	}()
+
 	<-Shutdown
 	app.Shutdown()
 	time.Sleep(2 * time.Second)
