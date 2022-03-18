@@ -131,6 +131,7 @@ func getError(error interface{}) *Error {
 		e = &Error{
 			Code:    UNKNOWN_ERRNO,
 			Message: "unknown error",
+			Data:    error,
 		}
 	}
 

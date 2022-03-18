@@ -3,7 +3,6 @@ package x
 import (
 	"context"
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"github.com/pkg/errors"
 	"net/http"
 	"time"
@@ -19,7 +18,7 @@ type IApplication interface {
 	Bootstrap(boots ...IBootstrap) IApplication
 
 	// AutoConfig 自动配置
-	AutoConfig() IApplication
+	//AutoConfig() IApplication
 
 	// Handler 获取路由
 	Handler() interface{}
@@ -62,15 +61,15 @@ func (d *DefaultHttp) Bootstrap(boots ...IBootstrap) IApplication {
 	return d
 }
 
-func (d *DefaultHttp) AutoConfig() IApplication {
-	path := fmt.Sprintf("./config/%s.toml", Env)
-	if _, err := toml.DecodeFile(path, &Configs); err != nil {
-		panic(err)
-	}
-
-	d.config = Configs.Http
-	return d
-}
+//func (d *DefaultHttp) AutoConfig() IApplication {
+//	path := fmt.Sprintf("./config/%s.toml", Env)
+//	if _, err := toml.DecodeFile(path, &Configs); err != nil {
+//		panic(err)
+//	}
+//
+//	d.config = Configs.Http
+//	return d
+//}
 
 func (d *DefaultHttp) Shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
