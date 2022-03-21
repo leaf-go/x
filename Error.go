@@ -40,10 +40,18 @@ func (e InfoErrno) Level() string {
 	return "info"
 }
 
+func (e InfoErrno) Error() string {
+	return errorMessage(e)
+}
+
 type TraceErrno Errno
 
 func (e TraceErrno) Level() string {
 	return "trace"
+}
+
+func (e TraceErrno) Error() string {
+	return errorMessage(e)
 }
 
 type DebugErrno Errno
@@ -52,10 +60,18 @@ func (e DebugErrno) Level() string {
 	return "debug"
 }
 
+func (e DebugErrno) Error() string {
+	return errorMessage(e)
+}
+
 type WarnErrno Errno
 
 func (e WarnErrno) Level() string {
 	return "warning"
+}
+
+func (e WarnErrno) Error() string {
+	return errorMessage(e)
 }
 
 type ErrorErrno Errno
@@ -64,16 +80,28 @@ func (e ErrorErrno) Level() string {
 	return "error"
 }
 
+func (e ErrorErrno) Error() string {
+	return errorMessage(e)
+}
+
 type FatalErrno Errno
 
 func (e FatalErrno) Level() string {
 	return "fatal"
 }
 
+func (e FatalErrno) Error() string {
+	return errorMessage(e)
+}
+
 type PanicErrno Errno
 
 func (e PanicErrno) Level() string {
 	return "panic"
+}
+
+func (e PanicErrno) Error() string {
+	return errorMessage(e)
 }
 
 func GetErrorMessage(no IErrno) string {
