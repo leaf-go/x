@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime/debug"
-	"time"
 )
 
 type IBootstrap interface {
@@ -60,7 +59,6 @@ func (d DefaultService) handler(name string) {
 
 	<-Shutdown
 	app.Shutdown()
-	time.Sleep(2 * time.Second)
 }
 
 func (d DefaultService) Boot() {

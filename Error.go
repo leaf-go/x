@@ -26,6 +26,14 @@ type IErrno interface {
 
 type Errno int
 
+func (e Errno) Level() string {
+	return "base"
+}
+
+func (e Errno) Error() string {
+	return errorMessage(e)
+}
+
 type InfoErrno Errno
 
 func (e InfoErrno) Level() string {
