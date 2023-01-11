@@ -1,16 +1,8 @@
 package x
 
-/*
-	x包定义框架基础能力,也可以配合使用
-	DefaultConfigs 配置
-	Context 中间上下文
-	Error 错误
-	defaultLog 日志配置
-	Validate 验证
-*/
-
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/goantor/logs"
 )
 
 type Roboter interface {
@@ -18,14 +10,13 @@ type Roboter interface {
 }
 
 type Context interface {
-	Logger
-	//Initialize(ctx interface{})
+	logs.Logger
 	Set(key string, value interface{})
 	Get(key string, def interface{}) interface{}
 }
 
 type GinContext struct {
-	Logger
+	logs.Logger
 	ctx *gin.Context
 }
 
@@ -41,6 +32,6 @@ func (g GinContext) Get(key string, def interface{}) interface{} {
 	return def
 }
 
-func NewContextWithGin(ctx *gin.Context, log Logger) Context {
+func NewContextWithGin(ctx *gin.Context, log logs.Logger) Context {
 	return &GinContext{ctx: ctx, Logger: log}
 }
