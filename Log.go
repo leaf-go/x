@@ -149,7 +149,7 @@ func getWriter(path string, rotationCount uint) *rotate.RotateLogs {
 	writer, err := rotate.New(
 		path+".%Y%m%d%H",
 		rotate.WithLinkName(path),
-		rotate.WithMaxAge(time.Duration(rotationCount)*24*time.Hour),
+		rotate.WithRotationCount(rotationCount),
 		rotate.WithRotationTime(time.Hour),
 	)
 
