@@ -21,7 +21,7 @@ type Context interface {
 	Logger
 	Set(key string, value interface{})
 	Get(key string, def interface{}) interface{}
-	Response(code int, h H)
+	Response(code int, h interface{})
 }
 
 type GinContext struct {
@@ -41,7 +41,7 @@ func (g GinContext) Get(key string, def interface{}) interface{} {
 	return def
 }
 
-func (g GinContext) Response(code int, h H) {
+func (g GinContext) Response(code int, h interface{}) {
 	if g.ctx.Writer.Written() {
 		return
 	}
